@@ -1,0 +1,56 @@
+{
+  "_source": "Base from sala Narrativa e Eventos (Guerra do Rio). Option 'ignorar' is always last and is the default.",
+  "dilemmas": [
+    {
+      "id": "comporta",
+      "title": "A primeira comporta",
+      "text": "O vizinho fechou uma comporta do Rio Verde. Seus campos secam.",
+      "options": [
+        { "id": "pagar", "label": "Pagar pela água (-5 dinheiro, +1 influência)", "effects": { "money": -5, "influence": 1 } },
+        { "id": "protestar", "label": "Protestar na assembleia (+1 influência, -1 reputação)", "effects": { "influence": 1, "reputation": -1 } },
+        { "id": "ignorar", "label": "Ignorar (-1 influência)", "effects": { "influence": -1 } }
+      ]
+    },
+    {
+      "id": "ponte",
+      "title": "A ponte",
+      "text": "Mercadores pedem fundos para uma ponte sobre o rio.",
+      "options": [
+        { "id": "financiar", "label": "Financiar (-10 dinheiro, +2 influência)", "effects": { "money": -10, "influence": 2 } },
+        { "id": "cobrar", "label": "Cobrar pedágio (+5 dinheiro, -1 reputação)", "effects": { "money": 5, "reputation": -1 } },
+        { "id": "sabotar", "label": "Sabotar a ponte rival (-2 dinheiro, -1 influência, +1 exército na capital)", "effects": { "money": -2, "influence": -1, "capitalArmy": 1 } },
+        { "id": "ignorar", "label": "Ignorar (-1 influência)", "effects": { "influence": -1 } }
+      ]
+    },
+    {
+      "id": "seca",
+      "title": "Preço da água",
+      "text": "A seca aperta. O povo pede ração.",
+      "options": [
+        { "id": "racionar", "label": "Racionar (-1 população na capital, +1 influência)", "effects": { "capitalPop": -1, "influence": 1 } },
+        { "id": "importar", "label": "Importar grãos (-8 dinheiro)", "effects": { "money": -8 } },
+        { "id": "ignorar", "label": "Ignorar (-1 influência)", "effects": { "influence": -1 } }
+      ]
+    },
+    {
+      "id": "alianca",
+      "title": "Proposta de aliança",
+      "text": "Um nobre estrangeiro oferece apoio em troca de tributo.",
+      "options": [
+        { "id": "aceitar", "label": "Aceitar (+2 exército na capital, -1 dinheiro/turno por 3 turnos)", "effects": { "capitalArmy": 2, "upkeepOverTurns": { "money": -1, "turns": 3 } } },
+        { "id": "recusar", "label": "Recusar com honra (+1 reputação)", "effects": { "reputation": 1 } },
+        { "id": "ignorar", "label": "Ignorar (-1 influência)", "effects": { "influence": -1 } }
+      ]
+    },
+    {
+      "id": "festival",
+      "title": "Festival da colheita",
+      "text": "O povo quer festa. Festa custa caro.",
+      "options": [
+        { "id": "festa", "label": "Dar a festa (-6 dinheiro, +1 população na capital)", "effects": { "money": -6, "capitalPop": 1 } },
+        { "id": "imposto", "label": "Cobrar imposto da festa (+6 dinheiro, -1 influência)", "effects": { "money": 6, "influence": -1 } },
+        { "id": "ignorar", "label": "Ignorar (-1 influência)", "effects": { "influence": -1 } }
+      ]
+    }
+  ]
+}

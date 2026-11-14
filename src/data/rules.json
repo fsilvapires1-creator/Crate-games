@@ -1,0 +1,83 @@
+{
+  "_source": "Make data store 201687, key coord-codigo-001 (Especificacao v0). Values marked _assumed are not in the spec.",
+  "saveVersion": 1,
+  "mode": { "maxTurns": 20, "minPlayers": 3, "maxPlayers": 5 },
+  "start": {
+    "money": 50,
+    "influence": 5,
+    "reputation": 0,
+    "armyPerRegion": 4,
+    "pop": 6,
+    "citiesPerRegion": 1
+  },
+  "neutral": { "_assumed": true, "army": 2, "pop": 4 },
+  "caps": { "influence": 30, "pop": 20, "wallsPerRegion": 2, "activeTreaties": 2 },
+  "costs": {
+    "recruit": 10,
+    "recruitAmount": 4,
+    "building": 30,
+    "farm": 30,
+    "wall": 15,
+    "treaty": 10,
+    "conquest": 20,
+    "influenceTrade": 10,
+    "influenceTradeAmount": 1
+  },
+  "effects": {
+    "farmFood": 3,
+    "wallDefense": 3,
+    "buildingIncome": 1,
+    "_buildingIncome_assumed": true
+  },
+  "economy": {
+    "incomePopDivisor": 2,
+    "popGrowthEveryTurns": 3,
+    "popGrowthAmount": 1,
+    "foodBase": 2,
+    "foodPopDivisor": 3,
+    "consumptionPopDivisor": 2,
+    "deficitPopLoss": 1,
+    "upkeepArmyDivisor": 3,
+    "desertionPerMissing": 3
+  },
+  "battle": {
+    "defenseDivisor": 10,
+    "winnerLossPct": 0.3,
+    "loserLossPct": 0.4,
+    "minLoss": 1,
+    "conquestPopLoss": 2,
+    "minPop": 1
+  },
+  "treaty": {
+    "duration": 8,
+    "incomePerRegion": 1,
+    "breakInfluence": 3,
+    "breakReputation": 2,
+    "breakMoney": 10
+  },
+  "score": {
+    "ownCapital": 3,
+    "conqueredCapital": 1,
+    "popDivisor": 4
+  },
+  "turn": {
+    "actionsPerTurn": 3,
+    "ignoreDilemmaInfluence": 1,
+    "missedWarn": 2,
+    "missedAuto": 3,
+    "missedExit": 5
+  },
+  "traits": {
+    "expansionista": { "name": "Expansionista", "buildingCost": 25, "startInfluenceDelta": -1 },
+    "mercador": { "name": "Mercador", "incomePerCity": 1, "startArmyPerRegion": 3 },
+    "diplomata": { "name": "Diplomata", "freeDiplomaticActions": 1, "battleForcePenalty": 1, "minForce": 1 },
+    "militarista": { "name": "Militarista", "startArmyPerRegion": 5, "extraUpkeepArmyDivisor": 4 },
+    "isolacionista": { "name": "Isolacionista", "foodPerCity": 1, "startInfluenceDelta": -1 }
+  },
+  "colors": {
+    "players": ["#2F6FDE", "#D64545", "#3BA55C", "#E0A526", "#8E5BD6"],
+    "neutral": "#8A8478",
+    "border": "#1E1B16"
+  },
+  "patterns": ["dots", "stripes", "cross", "waves", "grid"]
+}

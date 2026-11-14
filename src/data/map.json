@@ -1,0 +1,24 @@
+{
+  "_layout": "Hex grid, offset rows (odd rows shifted right). Adjacency is derived from hex neighbours.",
+  "cols": 4,
+  "rows": 3,
+  "regions": [
+    { "id": "vallonia", "name": "Vallonia", "col": 0, "row": 0 },
+    { "id": "pedra-alta", "name": "Pedra Alta", "col": 1, "row": 0 },
+    { "id": "corvena", "name": "Corvena", "col": 2, "row": 0 },
+    { "id": "norte-frio", "name": "Norte Frio", "col": 3, "row": 0 },
+    { "id": "vale-verde", "name": "Vale Verde", "col": 0, "row": 1 },
+    { "id": "rio-meio", "name": "Rio do Meio", "col": 1, "row": 1 },
+    { "id": "comporta", "name": "Comporta", "col": 2, "row": 1 },
+    { "id": "sarnia", "name": "Sarnia", "col": 3, "row": 1 },
+    { "id": "almaris", "name": "Almaris", "col": 0, "row": 2 },
+    { "id": "ponte", "name": "A Ponte", "col": 1, "row": 2 },
+    { "id": "delta", "name": "Delta", "col": 2, "row": 2 },
+    { "id": "costa-sul", "name": "Costa Sul", "col": 3, "row": 2 }
+  ],
+  "starts": {
+    "3": ["vallonia", "sarnia", "ponte"],
+    "4": ["vallonia", "norte-frio", "almaris", "costa-sul"],
+    "5": ["vallonia", "norte-frio", "almaris", "costa-sul", "rio-meio"]
+  }
+}
