@@ -115,3 +115,18 @@ describe('traços na criação', () => {
     expect(g.players[3].influence).toBe(4);
   });
 });
+
+describe('mapa por número de jogadores', () => {
+  it('uses 8 regions for 3 players and 12 for 4', async () => {
+    const { newGame } = await import('../../../src/engine');
+    const { mapData } = await import('./fixtures');
+    const three = newGame(['a', 'b', 'c'].map((n) => ({ name: n, trait: 'mercador' as const })), mapData, rules);
+    expect(three.regions).toHaveLength(8);
+    expect(makeGame().regions).toHaveLength(12);
+  });
+  it('gives neutral regions no income to anyone', () => {
+    const g = makeGame();
+    const before = g.players.map((_, i) => income(g, i, rules));
+    expect(before).toEqual([4, 4, 4, 4]);
+  });
+});

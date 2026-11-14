@@ -8,6 +8,7 @@ export function phaseOf(action: Action): Phase {
   switch (action.type) {
     case 'treaty':
     case 'breakTreaty':
+    case 'tradeInfluence':
       return 'diplomacia';
     case 'recruit':
     case 'wall':
@@ -129,6 +130,9 @@ export function applyAction(input: GameState, action: Action, rules: Rules): Act
     case 'building': {
       const r = ownRegion(action.region);
       if (typeof r === 'string') return fail(input, r);
+      if (action.type === 'building' && r.buildings >= rules.caps.buildingsPerRegion) {
+        return fail(input, `Máximo de ${rules.caps.buildingsPerRegion} edifícios`);
+      }
       const cost = action.type === 'farm' ? c.farm : buildingCost(state, me, rules);
       if (p.money < cost) return fail(input, `Precisa de ${cost} dinheiro`);
       p.money -= cost;

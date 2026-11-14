@@ -151,3 +151,24 @@ describe('prévia', () => {
     expect(previewAction(g, { type: 'recruit', region: 'vallonia' }, rules).reason).toMatch(/dinheiro/);
   });
 });
+
+describe('decisões da coordenação', () => {
+  it('limits buildings to 2 per region', () => {
+    let g = makeGame();
+    g.players[0].money = 200;
+    g = applyAction(g, { type: 'building', region: 'vallonia' }, rules).state;
+    g = applyAction(g, { type: 'building', region: 'vallonia' }, rules).state;
+    expect(applyAction(g, { type: 'building', region: 'vallonia' }, rules).ok).toBe(false);
+  });
+  it('puts the influence trade in phase 1 so recruiting still works after it', () => {
+    let g = makeGame();
+    g = applyAction(g, { type: 'tradeInfluence' }, rules).state;
+    expect(applyAction(g, { type: 'recruit', region: 'vallonia' }, rules).ok).toBe(true);
+  });
+  it('does not spend the Diplomata free action on a trade', () => {
+    const g = makeGame(['diplomata', 'mercador', 'mercador', 'mercador']);
+    const r = applyAction(g, { type: 'tradeInfluence' }, rules);
+    expect(r.state.freeDiplomaticLeft).toBe(1);
+    expect(r.state.actionsLeft).toBe(2);
+  });
+});

@@ -6,6 +6,8 @@ export interface MapData {
   rows: number;
   regions: { id: string; name: string; col: number; row: number }[];
   starts: Record<string, string[]>;
+  /** Optional subset of region ids used for a given player count (default: all). */
+  regionsByPlayers?: Record<string, string[]>;
 }
 
 /** Hex neighbours of (col,row) in an odd-row-shifted offset grid. */
@@ -18,9 +20,11 @@ export function hexNeighbours(col: number, row: number): [number, number][] {
 }
 
 /** Build regions with adjacency derived from the hex layout. */
-export function buildRegions(map: MapData, rules: Rules): Region[] {
-  const at = new Map(map.regions.map((r) => [`${r.col},${r.row}`, r.id]));
-  return map.regions.map((r) => ({
+export function buildRegions(map: MapData, rules: Rules, players?: number): Region[] {
+  const subset = players !== undefined ? map.regionsByPlayers?.[String(players)] : undefined;
+  const used = subset ? map.regions.filter((r) => subset.includes(r.id)) : map.regions;
+  const at = new Map(used.map((r) => [`${r.col},${r.row}`, r.id]));
+  return used.map((r) => ({
     id: r.id,
     name: r.name,
     col: r.col,
@@ -52,7 +56,7 @@ export function newGame(setup: PlayerSetup[], map: MapData, rules: Rules): GameS
     throw new Error(`Precisa de ${minPlayers} a ${maxPlayers} jogadores`);
   }
   const starts = map.starts[String(setup.length)];
-  const regions = buildRegions(map, rules);
+  const regions = buildRegions(map, rules, setup.length);
   const players: Player[] = setup.map((s, i) => {
     const t = rules.traits[s.trait] as { startInfluenceDelta?: number; startArmyPerRegion?: number };
     const region = regions.find((r) => r.id === starts[i])!;

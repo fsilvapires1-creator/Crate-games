@@ -10,8 +10,8 @@
     "pop": 6,
     "citiesPerRegion": 1
   },
-  "neutral": { "_assumed": true, "army": 2, "pop": 4 },
-  "caps": { "influence": 30, "pop": 20, "wallsPerRegion": 2, "activeTreaties": 2 },
+  "neutral": { "army": 2, "pop": 4 },
+  "caps": { "influence": 30, "pop": 20, "wallsPerRegion": 2, "buildingsPerRegion": 2, "activeTreaties": 2 },
   "costs": {
     "recruit": 10,
     "recruitAmount": 4,
@@ -26,8 +26,7 @@
   "effects": {
     "farmFood": 3,
     "wallDefense": 3,
-    "buildingIncome": 1,
-    "_buildingIncome_assumed": true
+    "buildingIncome": 1
   },
   "economy": {
     "incomePopDivisor": 2,
