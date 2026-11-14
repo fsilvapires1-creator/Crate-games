@@ -64,5 +64,6 @@
   "eliminated": "fora",
   "missed": "turnos perdidos: {n}",
   "treatyConsent": "{name} aceita o tratado?",
+  "starving": "⚠ {n} cidade(s) com fome",
   "keys": "Teclas: Enter confirma · Esc cancela · F passa a vez"
 }

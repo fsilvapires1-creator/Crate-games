@@ -22,9 +22,9 @@ export function phaseOf(action: Action): Phase {
   }
 }
 
-/** True for actions the Diplomata trait can take for free once per turn. */
+/** True for actions the Diplomata trait can take for free once per turn (money is still paid). */
 export function isDiplomatic(action: Action): boolean {
-  return action.type === 'treaty' || action.type === 'breakTreaty';
+  return action.type === 'treaty' || action.type === 'breakTreaty' || action.type === 'tradeInfluence';
 }
 
 /** Deep copy of the state (it is plain JSON). */
@@ -75,6 +75,7 @@ export function applyAction(input: GameState, action: Action, rules: Rules): Act
     case 'treaty': {
       const other = state.players[action.with];
       if (!other || other.id === me || other.eliminated) return fail(input, 'País inválido');
+      if (action.consent !== true) return fail(input, 'O outro país precisa aceitar o tratado');
       if (haveTreaty(state, me, other.id)) return fail(input, 'Já existe tratado');
       const max = rules.caps.activeTreaties;
       if (treatiesOf(state, me).length >= max || treatiesOf(state, other.id).length >= max) {
@@ -92,11 +93,12 @@ export function applyAction(input: GameState, action: Action, rules: Rules): Act
         (t) => (t.a === me && t.b === action.with) || (t.b === me && t.a === action.with),
       );
       if (idx < 0) return fail(input, 'Não há tratado com esse país');
+      if (p.money < rules.treaty.breakMoney) return fail(input, `Romper exige ${rules.treaty.breakMoney} dinheiro`);
       state.treaties.splice(idx, 1);
       const t = rules.treaty;
       p.influence = Math.max(0, p.influence - t.breakInfluence);
       p.reputation -= t.breakReputation;
-      p.money = Math.max(0, p.money - t.breakMoney);
+      p.money -= t.breakMoney;
       msgs.push(`${p.name} rompe o tratado com ${state.players[action.with].name} e paga a multa.`);
       break;
     }
@@ -179,6 +181,7 @@ export function applyAction(input: GameState, action: Action, rules: Rules): Act
         const loser = to.owner;
         to.owner = me;
         to.army = out.attackerLeft;
+        state.attackedFrom.push(to.id);
         to.pop = Math.max(rules.battle.minPop, to.pop - rules.battle.conquestPopLoss);
         to.growthClock = 0;
         p.money -= c.conquest;

@@ -93,7 +93,8 @@ export interface GameState {
 
 /** Everything a player can do. */
 export type Action =
-  | { type: 'treaty'; with: number }
+  /** `consent` must be true: the other player accepted. */
+  | { type: 'treaty'; with: number; consent: boolean }
   | { type: 'breakTreaty'; with: number }
   | { type: 'tradeInfluence' }
   | { type: 'recruit'; region: string }

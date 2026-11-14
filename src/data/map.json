@@ -78,22 +78,58 @@
   ],
   "starts": {
     "3": [
-      "vallonia",
-      "comporta",
-      "almaris"
+      [
+        "vallonia",
+        "vale-verde"
+      ],
+      [
+        "corvena",
+        "comporta"
+      ],
+      [
+        "almaris",
+        "ponte"
+      ]
     ],
     "4": [
-      "vallonia",
-      "norte-frio",
-      "almaris",
-      "costa-sul"
+      [
+        "vallonia",
+        "vale-verde"
+      ],
+      [
+        "norte-frio",
+        "sarnia"
+      ],
+      [
+        "almaris",
+        "ponte"
+      ],
+      [
+        "costa-sul",
+        "delta"
+      ]
     ],
     "5": [
-      "vallonia",
-      "norte-frio",
-      "almaris",
-      "costa-sul",
-      "rio-meio"
+      [
+        "vallonia",
+        "vale-verde"
+      ],
+      [
+        "norte-frio",
+        "sarnia"
+      ],
+      [
+        "almaris",
+        "ponte"
+      ],
+      [
+        "costa-sul",
+        "delta"
+      ],
+      [
+        "corvena",
+        "pedra-alta"
+      ]
     ]
   },
   "regionsByPlayers": {
@@ -107,5 +143,6 @@
       "almaris",
       "ponte"
     ]
-  }
+  },
+  "_starts": "Each seat lists its regions; the first is the capital."
 }

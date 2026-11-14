@@ -16,10 +16,10 @@ describe('fim de turno', () => {
   });
   it('pays income minus upkeep at the end of the player turn', () => {
     const g = makeGame();
-    // Mercador: floor(6/2)+1 = 4 income; upkeep floor(4/3)=1
+    // Mercador, 2 cities: (3+1)*2 = 8 income; upkeep floor(3/3)*2 = 2
     const { state, report } = endTurn(g, dilemmas, rules);
-    expect(state.players[0].money).toBe(53);
-    expect(report.find((l) => l.label === 'Renda')!.value).toBe(4);
+    expect(state.players[0].money).toBe(56);
+    expect(report.find((l) => l.label === 'Renda')!.value).toBe(8);
   });
   it('passes the turn to the next player and resets actions', () => {
     let g = makeGame();
@@ -50,13 +50,14 @@ describe('fim de turno', () => {
     const g = makeGame();
     g.players[0].money = 0;
     setRegion(g, 'vallonia', { army: 30, pop: 1 });
-    // income floor(1/2)+1 = 1 ; upkeep 10 ; missing 9 -> 3 desert
+    setRegion(g, 'vale-verde', { army: 1, pop: 1 });
+    // income (0+1)*2 = 2 ; upkeep 10 ; missing 8 -> 2 desert
     const after = endTurn(g, dilemmas, rules).state;
     expect(after.players[0].money).toBe(0);
-    expect(after.regions.find((r) => r.id === 'vallonia')!.army).toBe(27);
+    expect(after.regions.find((r) => r.id === 'vallonia')!.army).toBe(28);
   });
   it('expires a treaty after 8 rounds', () => {
-    let g = applyAction(makeGame(), { type: 'treaty', with: 1 }, rules).state;
+    let g = applyAction(makeGame(), { type: 'treaty', with: 1, consent: true }, rules).state;
     for (let i = 0; i < 7; i++) g = endRound(g);
     expect(g.treaties).toHaveLength(1);
     g = endRound(g);
@@ -118,16 +119,16 @@ describe('turno perdido', () => {
 describe('save', () => {
   it('round-trips the whole state', () => {
     const g = endRound(makeGame());
-    const parsed = parseSave(exportSave(g), rules.saveVersion);
+    const parsed = parseSave(exportSave(g), rules);
     expect(parsed.ok && parsed.state).toEqual(g);
   });
   it('refuses another version', () => {
     const g = makeGame();
-    const parsed = parseSave(exportSave({ ...g, version: 99 }), rules.saveVersion);
+    const parsed = parseSave(exportSave({ ...g, version: 99 }), rules);
     expect(parsed.ok).toBe(false);
   });
   it('refuses broken JSON', () => {
-    expect(parseSave('{oops', rules.saveVersion).ok).toBe(false);
+    expect(parseSave('{oops', rules).ok).toBe(false);
   });
 });
 
@@ -142,5 +143,60 @@ describe('ações por turno', () => {
     const next = endRound(g);
     expect(next.current).toBe(0);
     expect(next.actionsLeft).toBe(4);
+  });
+});
+
+describe('revisão Fable (turno e save)', () => {
+  it('M1: an option the player cannot pay becomes Ignorar', () => {
+    const g = makeGame();
+    g.players[0].money = 0;
+    const d = dilemmas.find((x) => x.id === 'ponte')!;
+    const after = chooseDilemma(g, d, 'financiar', rules);
+    expect(after.players[0].influence).toBe(4);
+  });
+  it('B3: a dilemma never drops the capital army below 1', () => {
+    const g = makeGame();
+    setRegion(g, 'vallonia', { army: 1 });
+    const d = { id: 'x', title: 'X', text: '', options: [{ id: 'a', label: 'a', effects: { capitalArmy: -5 } }, { id: 'ignorar', label: 'i', effects: {} }] };
+    expect(chooseDilemma(g, d, 'a', rules).regions.find((r) => r.id === 'vallonia')!.army).toBe(1);
+  });
+  it('M5: desertion takes the largest army first, ties by id, never below 1', () => {
+    const g = makeGame();
+    g.players[0].money = 0;
+    for (const r of g.regions) Object.assign(r, { owner: 0, army: 1, pop: 1 });
+    g.players[0].trait = 'militarista';
+    // 12 armies of 1: upkeep floor(12/4) = 3, income 0 -> 1 would desert, but none may drop below 1
+    const after = endTurn(g, dilemmas, rules).state;
+    expect(after.regions.filter((r) => r.owner === 0).every((r) => r.army === 1)).toBe(true);
+  });
+  it('M2: a player who leaves after 5 missed turns leaves neutral regions with army 0', () => {
+    let g = makeGame();
+    for (let k = 0; k < 5; k++) {
+      g = endTurn(g, dilemmas, rules, true).state;
+      for (let i = 1; i < 4; i++) g = endTurn(g, dilemmas, rules).state;
+    }
+    const v = g.regions.find((r) => r.id === 'vallonia')!;
+    expect(v.owner).toBe(null);
+    expect(v.army).toBe(0);
+    expect(v.capitalOf).toBe(0);
+  });
+  it('A3: refuses saves with bad types, HTML in ids or out-of-range numbers', () => {
+    const good = JSON.parse(exportSave(makeGame()));
+    const cases: ((s: any) => void)[] = [
+      (s) => { s.players[0].id = '"><img src=x onerror=alert(1)>'; },
+      (s) => { s.log[0].turn = '<b>1</b>'; },
+      (s) => { s.players[0].trait = 'rei'; },
+      (s) => { s.current = 99; },
+      (s) => { s.players[0].money = -1e9; },
+      (s) => { s.regions[0].army = 1.5; },
+      (s) => { s.maxTurns = '20'; },
+      (s) => { s.regions[0].adj = ['nowhere']; },
+    ];
+    for (const breakIt of cases) {
+      const s = structuredClone(good);
+      breakIt(s);
+      expect(parseSave(JSON.stringify(s), rules).ok).toBe(false);
+    }
+    expect(parseSave(JSON.stringify(good), rules).ok).toBe(true);
   });
 });

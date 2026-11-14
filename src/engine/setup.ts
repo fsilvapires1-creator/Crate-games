@@ -5,7 +5,8 @@ export interface MapData {
   cols: number;
   rows: number;
   regions: { id: string; name: string; col: number; row: number }[];
-  starts: Record<string, string[]>;
+  /** Regions of each seat; the first one is the capital. */
+  starts: Record<string, string[][]>;
   /** Optional subset of region ids used for a given player count (default: all). */
   regionsByPlayers?: Record<string, string[]>;
 }
@@ -59,11 +60,13 @@ export function newGame(setup: PlayerSetup[], map: MapData, rules: Rules): GameS
   const regions = buildRegions(map, rules, setup.length);
   const players: Player[] = setup.map((s, i) => {
     const t = rules.traits[s.trait] as { startInfluenceDelta?: number; startArmyPerRegion?: number };
-    const region = regions.find((r) => r.id === starts[i])!;
-    region.owner = i;
-    region.capitalOf = i;
-    region.pop = rules.start.pop;
-    region.army = t.startArmyPerRegion ?? rules.start.armyPerRegion;
+    starts[i].forEach((id, k) => {
+      const region = regions.find((r) => r.id === id)!;
+      region.owner = i;
+      if (k === 0) region.capitalOf = i;
+      region.pop = rules.start.pop;
+      region.army = t.startArmyPerRegion ?? rules.start.armyPerRegion;
+    });
     return {
       id: i,
       name: s.name,

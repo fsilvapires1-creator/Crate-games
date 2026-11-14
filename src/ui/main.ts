@@ -3,7 +3,7 @@ import mapJson from '../data/map.json';
 import dilemmasJson from '../data/dilemmas.json';
 import {
   newGame, applyAction, previewAction, endTurn, chooseDilemma, dilemmaFor, exportSave, parseSave, saveFileName,
-  income, upkeep, foodBalance, totalArmy, ranking, treatiesOf, buildingCost, PHASES,
+  income, upkeep, foodBalance, starvingCities, canAffordOption, totalArmy, ranking, treatiesOf, buildingCost, PHASES,
   type Action, type GameState, type MapData, type TraitId, type Dilemma, type ReportLine, type Rules,
 } from '../engine';
 import { t } from './i18n';
@@ -209,7 +209,7 @@ function renderDiplomacy(g: GameState): string {
         ? `<span class="muted">${t('eliminated')}</span>`
         : tr
           ? `${t('treatyLeft', { n: tr.turnsLeft })} ${actionButton(t('breakTreaty'), { type: 'breakTreaty', with: p.id })}`
-          : `<button data-treaty="${p.id}">${t('treaty', { cost: rules.costs.treaty })}</button>`;
+          : `<button data-treaty="${esc(String(p.id))}">${t('treaty', { cost: rules.costs.treaty })}</button>`;
       return `<tr><td><span style="color:${color(p.id)}">■</span> ${esc(p.name)}</td><td>${status}</td></tr>`;
     })
     .join('');
@@ -220,7 +220,10 @@ function renderDiplomacy(g: GameState): string {
 function renderDilemma(g: GameState): string {
   if (g.dilemma?.resolved) return '';
   const d = dilemmaFor(g, dilemmas);
-  const opts = d.options.map((o) => `<button class="opt" data-dilemma="${o.id}">${esc(o.label)}</button>`).join('');
+  const money = g.players[g.current].money;
+  const opts = d.options
+    .map((o) => `<button class="opt" data-dilemma="${esc(o.id)}" ${canAffordOption(money, o) ? '' : 'disabled'}>${esc(o.label)}</button>`)
+    .join('');
   return `<div class="card dilemma"><h3>${t('dilemma')}: ${esc(d.title)}</h3><div>${esc(d.text)}</div>${opts}</div>`;
 }
 
@@ -241,7 +244,7 @@ function renderLog(g: GameState): string {
   const items = g.log
     .slice(-40)
     .reverse()
-    .map((l) => `<div><span class="muted">T${l.turn}</span> ${l.player !== null ? `<span style="color:${color(l.player)}">■</span> ` : ''}${esc(l.text)}</div>`)
+    .map((l) => `<div><span class="muted">T${esc(String(l.turn))}</span> ${l.player !== null ? `<span style="color:${color(l.player)}">■</span> ` : ''}${esc(l.text)}</div>`)
     .join('');
   return `<div class="card"><h3>${t('log')}</h3><div class="log">${items}</div></div>`;
 }
@@ -250,6 +253,7 @@ function renderTopbar(g: GameState): string {
   const me = g.current;
   const p = g.players[me];
   const food = foodBalance(g, me, rules);
+  const starving = starvingCities(g, me, rules);
   const phases = PHASES.map(
     (ph, i) => `<span class="${i === g.phaseIndex ? 'on' : i < g.phaseIndex ? 'done' : ''}">${t('phase.' + ph)}</span>`,
   ).join('');
@@ -259,7 +263,7 @@ function renderTopbar(g: GameState): string {
     <div class="stat">${t('money')} <b>${p.money}</b> <small>(+${income(g, me, rules)} −${upkeep(g, me, rules)})</small></div>
     <div class="stat">${t('army')} <b>${totalArmy(g, me)}</b></div>
     <div class="stat">${t('influence')} <b>${p.influence}</b></div>
-    <div class="stat">${t('food')} <b class="${food < 0 ? 'neg' : ''}">${food >= 0 ? '+' : ''}${food}</b></div>
+    <div class="stat">${t('food')} <b class="${food < 0 ? 'neg' : ''}">${food >= 0 ? '+' : ''}${food}</b>${starving ? ` <span class="neg">${t('starving', { n: starving })}</span>` : ''}</div>
     <div class="stat">${t('actions')} <b>${g.actionsLeft}</b>${g.freeDiplomaticLeft ? ` +${g.freeDiplomaticLeft} ${t('free')}` : ''}</div>
     <div class="spacer"></div>
     <button data-act="export">${t('export')}</button>
@@ -381,7 +385,7 @@ function pickImport() {
     const file = input.files?.[0];
     if (!file) return;
     const text = await file.text();
-    const parsed = parseSave(text, rules.saveVersion);
+    const parsed = parseSave(text, rules);
     view.overlay = parsed.ok ? { kind: 'import', state: parsed.state, text } : { kind: 'error', text: t('importBad', { reason: parsed.reason }) };
     render();
   };
@@ -449,7 +453,7 @@ app.addEventListener('click', (ev) => {
       break;
     case 'treatyYes':
       if (view.overlay?.kind === 'treaty') {
-        view.pending = { type: 'treaty', with: view.overlay.with };
+        view.pending = { type: 'treaty', with: view.overlay.with, consent: true };
         view.overlay = null;
         return confirmPending();
       }

@@ -40,13 +40,21 @@ function capitalOrFirst(state: GameState, player: number) {
   return owned.find((r) => r.capitalOf === player) ?? owned[0];
 }
 
+/** True when the player has the money a dilemma option costs. */
+export function canAffordOption(money: number, option: { effects: DilemmaEffects }): boolean {
+  const cost = option.effects.money ?? 0;
+  return cost >= 0 || money >= -cost;
+}
+
 /**
  * Resolve the current player's dilemma with one option. Never blocks actions.
- * Returns the input state unchanged if the dilemma was already resolved.
+ * An option the player cannot pay for becomes Ignorar. Returns the input state unchanged if the dilemma was already resolved.
  */
 export function chooseDilemma(input: GameState, dilemma: Dilemma, optionId: string, rules: Rules): GameState {
   if (input.dilemma?.resolved) return input;
-  const opt = dilemma.options.find((o) => o.id === optionId) ?? dilemma.options.find((o) => o.id === IGNORE_OPTION)!;
+  const ignore = dilemma.options.find((o) => o.id === IGNORE_OPTION)!;
+  const picked = dilemma.options.find((o) => o.id === optionId) ?? ignore;
+  const opt = canAffordOption(input.players[input.current].money, picked) ? picked : ignore;
   const state = clone(input);
   const p = state.players[state.current];
   const e = opt.effects;
@@ -54,7 +62,7 @@ export function chooseDilemma(input: GameState, dilemma: Dilemma, optionId: stri
   if (e.influence) p.influence = Math.min(rules.caps.influence, Math.max(0, p.influence + e.influence));
   if (e.reputation) p.reputation += e.reputation;
   const cap = capitalOrFirst(state, p.id);
-  if (cap && e.capitalArmy) cap.army += e.capitalArmy;
+  if (cap && e.capitalArmy) cap.army = Math.max(1, cap.army + e.capitalArmy);
   if (cap && e.capitalPop) cap.pop = Math.min(rules.caps.pop, Math.max(rules.battle.minPop, cap.pop + e.capitalPop));
   if (e.upkeepOverTurns) {
     p.recurring.push({ money: e.upkeepOverTurns.money, turnsLeft: e.upkeepOverTurns.turns, label: dilemma.title });
@@ -91,14 +99,17 @@ export function runEconomy(state: GameState, rules: Rules): ReportLine[] {
     const missing = up - p.money;
     p.money = 0;
     let gone = desertions(missing, rules);
-    lines.push({ label: 'Desertores', value: -gone });
-    const regions = ownedRegions(state, me).sort((a, b) => b.army - a.army);
-    while (gone > 0 && regions.some((r) => r.army > 0)) {
-      const r = regions.find((x) => x.army > 1) ?? regions.find((x) => x.army > 0)!;
+    let left = 0;
+    const regions = ownedRegions(state, me);
+    while (gone > 0) {
+      // Largest army first, ties by id; never below 1.
+      const r = regions.filter((x) => x.army > 1).sort((a, b) => b.army - a.army || a.id.localeCompare(b.id))[0];
+      if (!r) break;
       r.army -= 1;
       gone -= 1;
-      regions.sort((a, b) => b.army - a.army);
+      left += 1;
     }
+    lines.push({ label: 'Desertores', value: -left });
   }
 
   let popLost = 0;
@@ -166,7 +177,11 @@ export function endTurn(input: GameState, dilemmas: Dilemma[], rules: Rules, ski
     if (p.missedTurns >= t.missedExit) {
       p.eliminated = true;
       state.treaties = state.treaties.filter((x) => x.a !== p.id && x.b !== p.id);
-      state.log.push({ turn: state.turn, player: p.id, text: `${p.name} perdeu ${p.missedTurns} turnos e sai da partida.` });
+      for (const r of ownedRegions(state, p.id)) {
+        r.owner = null;
+        r.army = 0;
+      }
+      state.log.push({ turn: state.turn, player: p.id, text: `${p.name} perdeu ${p.missedTurns} turnos e sai da partida; suas regiões ficam neutras.` });
     } else if (p.missedTurns >= t.missedAuto) {
       state.log.push({ turn: state.turn, player: p.id, text: `${p.name} ausente: ação padrão automática (${p.missedTurns}).` });
     } else if (p.missedTurns >= t.missedWarn) {

@@ -102,6 +102,7 @@ describe('ataque e conquista', () => {
   it('eliminates a player who loses the last city', () => {
     const g = makeGame();
     setRegion(g, 'norte-frio', { army: 1 });
+    setRegion(g, 'sarnia', { owner: null });
     setRegion(g, 'corvena', { owner: 0, army: 10 });
     const r = applyAction(g, { type: 'attack', from: 'corvena', to: 'norte-frio', amount: 9 }, rules);
     expect(r.state.players[1].eliminated).toBe(true);
@@ -110,20 +111,20 @@ describe('ataque e conquista', () => {
 
 describe('tratados', () => {
   it('costs 10 to each side and lasts 8 turns', () => {
-    const r = applyAction(makeGame(), { type: 'treaty', with: 1 }, rules);
+    const r = applyAction(makeGame(), { type: 'treaty', with: 1, consent: true }, rules);
     expect(r.state.players[0].money).toBe(40);
     expect(r.state.players[1].money).toBe(40);
     expect(r.state.treaties[0].turnsLeft).toBe(8);
   });
   it('allows at most 2 active treaties', () => {
     let g = makeGame();
-    g = applyAction(g, { type: 'treaty', with: 1 }, rules).state;
-    g = applyAction(g, { type: 'treaty', with: 2 }, rules).state;
-    expect(applyAction(g, { type: 'treaty', with: 3 }, rules).ok).toBe(false);
+    g = applyAction(g, { type: 'treaty', with: 1, consent: true }, rules).state;
+    g = applyAction(g, { type: 'treaty', with: 2, consent: true }, rules).state;
+    expect(applyAction(g, { type: 'treaty', with: 3, consent: true }, rules).ok).toBe(false);
   });
   it('break costs -3 influence, -2 reputation, -10 money', () => {
     let g = makeGame();
-    g = applyAction(g, { type: 'treaty', with: 1 }, rules).state;
+    g = applyAction(g, { type: 'treaty', with: 1, consent: true }, rules).state;
     const r = applyAction(g, { type: 'breakTreaty', with: 1 }, rules);
     expect(r.state.treaties).toHaveLength(0);
     expect(r.state.players[0].influence).toBe(2);
@@ -132,7 +133,7 @@ describe('tratados', () => {
   });
   it('gives Diplomata one free diplomatic action', () => {
     const g = makeGame(['diplomata', 'mercador', 'mercador', 'mercador']);
-    const r = applyAction(g, { type: 'treaty', with: 1 }, rules);
+    const r = applyAction(g, { type: 'treaty', with: 1, consent: true }, rules);
     expect(r.state.actionsLeft).toBe(3);
     expect(r.state.freeDiplomaticLeft).toBe(0);
   });
@@ -165,11 +166,12 @@ describe('decisões da coordenação', () => {
     g = applyAction(g, { type: 'tradeInfluence' }, rules).state;
     expect(applyAction(g, { type: 'recruit', region: 'vallonia' }, rules).ok).toBe(true);
   });
-  it('does not spend the Diplomata free action on a trade', () => {
+  it('uses the Diplomata free action on a trade, money still paid', () => {
     const g = makeGame(['diplomata', 'mercador', 'mercador', 'mercador']);
     const r = applyAction(g, { type: 'tradeInfluence' }, rules);
-    expect(r.state.freeDiplomaticLeft).toBe(1);
-    expect(r.state.actionsLeft).toBe(2);
+    expect(r.state.freeDiplomaticLeft).toBe(0);
+    expect(r.state.actionsLeft).toBe(3);
+    expect(r.state.players[0].money).toBe(40);
   });
 });
 
@@ -179,5 +181,26 @@ describe('edifício na fase 2', () => {
     g.players[0].money = 200;
     g = applyAction(g, { type: 'building', region: 'vallonia' }, rules).state;
     expect(applyAction(g, { type: 'recruit', region: 'vallonia' }, rules).ok).toBe(true);
+  });
+});
+
+describe('revisão Fable', () => {
+  it('A2: troops that just conquered cannot attack again this turn', () => {
+    const g = makeGame();
+    setRegion(g, 'vallonia', { army: 30 });
+    setRegion(g, 'pedra-alta', { army: 1 });
+    const won = applyAction(g, { type: 'attack', from: 'vallonia', to: 'pedra-alta', amount: 20 }, rules).state;
+    expect(won.regions.find((r) => r.id === 'pedra-alta')!.owner).toBe(0);
+    const chain = applyAction(won, { type: 'attack', from: 'pedra-alta', to: 'corvena', amount: 5 }, rules);
+    expect(chain.ok).toBe(false);
+  });
+  it('M4: refuses a treaty without consent', () => {
+    const r = applyAction(makeGame(), { type: 'treaty', with: 1, consent: false }, rules);
+    expect(r.ok).toBe(false);
+  });
+  it('B1: breaking a treaty needs 10 money', () => {
+    let g = applyAction(makeGame(), { type: 'treaty', with: 1, consent: true }, rules).state;
+    g.players[0].money = 9;
+    expect(applyAction(g, { type: 'breakTreaty', with: 1 }, rules).ok).toBe(false);
   });
 });

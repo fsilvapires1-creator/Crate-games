@@ -145,9 +145,10 @@ export function totalArmy(state: GameState, player: number): number {
   return ownedRegions(state, player).reduce((s, r) => s + r.army, 0);
 }
 
-/** Final ranking: score desc, then army desc. */
+/** Final ranking of players still in the game: score desc, then army desc. */
 export function ranking(state: GameState, rules: Rules) {
   return state.players
+    .filter((p) => !p.eliminated)
     .map((p) => ({ player: p.id, name: p.name, score: score(state, p.id, rules), army: totalArmy(state, p.id) }))
     .sort((x, y) => y.score - x.score || y.army - x.army);
 }
@@ -157,4 +158,10 @@ export function actionsFor(state: GameState, player: number, rules: Rules): numb
   const t = rules.turn;
   const bonus = ownedRegions(state, player).length >= t.bonusActionMinRegions ? 1 : 0;
   return Math.min(t.maxActionsPerTurn, t.actionsPerTurn + bonus);
+}
+
+/** Owned cities whose own food production is below consumption (they lose pop at turn end). */
+export function starvingCities(state: GameState, player: number, rules: Rules): number {
+  const p = state.players[player];
+  return ownedRegions(state, player).filter((r) => foodProduced(r, p, rules) < foodConsumed(r, rules)).length;
 }

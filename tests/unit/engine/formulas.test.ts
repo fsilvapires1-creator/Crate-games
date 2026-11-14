@@ -18,8 +18,8 @@ describe('renda', () => {
     const g = makeGame(['diplomata', 'diplomata', 'mercador', 'mercador']);
     setRegion(g, 'pedra-alta', { owner: 0, pop: 4 });
     g.treaties.push({ a: 0, b: 1, turnsLeft: 8, signedTurn: 1 });
-    // cities: floor(6/2)=3 + floor(4/2)=2 ; treaty: 1 treaty * 2 regions = 2
-    expect(income(g, 0, rules)).toBe(7);
+    // cities: 3 (vallonia) + 3 (vale-verde) + 2 (pedra-alta) ; treaty: 1 treaty * 3 regions = 3
+    expect(income(g, 0, rules)).toBe(11);
   });
 });
 
@@ -40,12 +40,13 @@ describe('manutenção', () => {
   it('charges floor(army/3) per region', () => {
     const g = makeGame();
     setRegion(g, 'vallonia', { army: 8 });
-    setRegion(g, 'pedra-alta', { owner: 0, army: 2 });
+    setRegion(g, 'vale-verde', { army: 2 });
     expect(upkeep(g, 0, rules)).toBe(2);
   });
   it('adds floor(total/4) for Militarista', () => {
     const g = makeGame(['militarista', 'mercador', 'mercador', 'mercador']);
     setRegion(g, 'vallonia', { army: 9 });
+    setRegion(g, 'vale-verde', { army: 0 });
     expect(upkeep(g, 0, rules)).toBe(3 + 2);
   });
   it('deserts one army per 3 missing money', () => {
@@ -85,19 +86,19 @@ describe('batalha', () => {
 describe('pontuação', () => {
   it('scores own capital x3 + floor(pop/4) + influence', () => {
     const g = makeGame();
-    // capital 3 + floor(6/4)=1 + influence 5
-    expect(score(g, 0, rules)).toBe(9);
+    // capital 3 + floor(12/4)=3 + influence 5
+    expect(score(g, 0, rules)).toBe(11);
   });
   it('counts a conquered capital as x1', () => {
     const g = makeGame();
     setRegion(g, 'norte-frio', { owner: 0, pop: 2 });
-    // own 3 + conquered 1 + floor(8/4)=2 + 5
-    expect(score(g, 0, rules)).toBe(11);
+    // own 3 + conquered 1 + floor(14/4)=3 + 5
+    expect(score(g, 0, rules)).toBe(12);
   });
   it('caps influence at 30', () => {
     const g = makeGame();
     g.players[0].influence = 40;
-    expect(score(g, 0, rules)).toBe(3 + 1 + 30);
+    expect(score(g, 0, rules)).toBe(3 + 3 + 30);
   });
   it('breaks ties by total army', () => {
     const g = makeGame();
@@ -127,6 +128,25 @@ describe('mapa por número de jogadores', () => {
   it('gives neutral regions no income to anyone', () => {
     const g = makeGame();
     const before = g.players.map((_, i) => income(g, i, rules));
-    expect(before).toEqual([4, 4, 4, 4]);
+    expect(before).toEqual([8, 8, 8, 8]);
+  });
+});
+
+describe('revisão Fable (mapa e ranking)', () => {
+  it('A1: every player starts with 2 regions; neutrals are 2/4/2', async () => {
+    const { newGame } = await import('../../../src/engine');
+    const { mapData } = await import('./fixtures');
+    for (const [n, neutrals] of [[3, 2], [4, 4], [5, 2]] as const) {
+      const g = newGame(Array.from({ length: n }, (_, i) => ({ name: `P${i}`, trait: 'mercador' as const })), mapData, rules);
+      for (let i = 0; i < n; i++) expect(g.regions.filter((r) => r.owner === i)).toHaveLength(2);
+      expect(g.regions.filter((r) => r.owner === null)).toHaveLength(neutrals);
+      expect(g.regions.filter((r) => r.capitalOf !== null)).toHaveLength(n);
+    }
+  });
+  it('M2: leaves eliminated players out of the ranking', () => {
+    const g = makeGame();
+    g.players[0].eliminated = true;
+    g.players[0].influence = 30;
+    expect(ranking(g, rules).map((r) => r.player)).not.toContain(0);
   });
 });
