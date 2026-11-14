@@ -151,3 +151,10 @@ export function ranking(state: GameState, rules: Rules) {
     .map((p) => ({ player: p.id, name: p.name, score: score(state, p.id, rules), army: totalArmy(state, p.id) }))
     .sort((x, y) => y.score - x.score || y.army - x.army);
 }
+
+/** Actions for a player turn: base, +1 with enough regions, capped. Diplomata's free action is separate. */
+export function actionsFor(state: GameState, player: number, rules: Rules): number {
+  const t = rules.turn;
+  const bonus = ownedRegions(state, player).length >= t.bonusActionMinRegions ? 1 : 0;
+  return Math.min(t.maxActionsPerTurn, t.actionsPerTurn + bonus);
+}

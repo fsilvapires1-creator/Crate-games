@@ -130,3 +130,17 @@ describe('save', () => {
     expect(parseSave('{oops', rules.saveVersion).ok).toBe(false);
   });
 });
+
+describe('ações por turno', () => {
+  it('gives 3 actions with fewer than 4 regions', () => {
+    const g = endRound(makeGame());
+    expect(g.actionsLeft).toBe(3);
+  });
+  it('gives a 4th action with 4 or more regions, never more than 4', () => {
+    const g = makeGame();
+    for (const id of ['pedra-alta', 'vale-verde', 'rio-meio', 'corvena']) setRegion(g, id, { owner: 0 });
+    const next = endRound(g);
+    expect(next.current).toBe(0);
+    expect(next.actionsLeft).toBe(4);
+  });
+});

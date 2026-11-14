@@ -13,6 +13,7 @@ export function phaseOf(action: Action): Phase {
     case 'recruit':
     case 'wall':
     case 'move':
+    case 'building':
       return 'recrutamento';
     case 'attack':
       return 'ataque';

@@ -61,6 +61,8 @@
   },
   "turn": {
     "actionsPerTurn": 3,
+    "bonusActionMinRegions": 4,
+    "maxActionsPerTurn": 4,
     "ignoreDilemmaInfluence": 1,
     "missedWarn": 2,
     "missedAuto": 3,

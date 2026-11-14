@@ -1,6 +1,6 @@
 import type { GameState, Rules } from './types';
 import { clone } from './actions';
-import { desertions, foodConsumed, foodProduced, income, ownedRegions, recurringMoney, upkeep } from './formulas';
+import { actionsFor, desertions, foodConsumed, foodProduced, income, ownedRegions, recurringMoney, upkeep } from './formulas';
 
 /** Dilemma data shape, matching `src/data/dilemmas.json`. */
 export interface DilemmaEffects {
@@ -134,7 +134,7 @@ function firstAlive(state: GameState): number {
 
 function beginTurnFor(state: GameState, player: number, rules: Rules) {
   state.current = player;
-  state.actionsLeft = rules.turn.actionsPerTurn;
+  state.actionsLeft = actionsFor(state, player, rules);
   state.freeDiplomaticLeft =
     state.players[player].trait === 'diplomata' ? rules.traits.diplomata.freeDiplomaticActions : 0;
   state.phaseIndex = 0;

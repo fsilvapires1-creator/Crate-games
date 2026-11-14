@@ -172,3 +172,12 @@ describe('decisões da coordenação', () => {
     expect(r.state.actionsLeft).toBe(2);
   });
 });
+
+describe('edifício na fase 2', () => {
+  it('allows recruiting after a building', () => {
+    let g = makeGame();
+    g.players[0].money = 200;
+    g = applyAction(g, { type: 'building', region: 'vallonia' }, rules).state;
+    expect(applyAction(g, { type: 'recruit', region: 'vallonia' }, rules).ok).toBe(true);
+  });
+});
