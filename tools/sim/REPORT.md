@@ -42,7 +42,7 @@ Comparação: commit `a855d7b` (antes das correções), em `results/a855d7b/`.
 - População: sem fazenda a cidade passa fome ao chegar a 11 (produz 5, consome 6). Perda por fome: 2 a 3 de pop por país em 20 turnos; 26 a 35 em 60 turnos. O teto 20 nunca é alcançado.
 
 ## Campanha de 60 turnos (10 sessões de 6)
-- Sem inflação para quem joga: caixa médio 27 → 58. Só o passivo acumula (308 em média, máximo 710).
+- Sem inflação para quem joga: caixa final dos bots ativos entre 5 e 31. Só o passivo acumula (308 em média, máximo 710) e puxa a média geral de 27 para 58.
 - Estagnação a partir do turno 30 a 36: pontuação 31,4 (T36) → 35,0 (T60); na mesa pacífica 39,4 → 41,0.
 - Influência bate no teto 30 perto do turno 30 na mesa pacífica; depois disso o dinheiro não tem mais uso.
 - Manutenção alcança a renda: renda 17,9 e manutenção 17,3 no turno 60 (exército médio 51). A economia aguenta, mas trava.
