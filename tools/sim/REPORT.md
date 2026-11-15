@@ -2,11 +2,11 @@
 
 Data: 2026-11-15. Sala: Fable. Fonte: `tools/sim` na branch `ccr-a759ed9c-2b4eyy` do repo Crate-games.
 Motor testado: commit `e56251f` da sala de Código (73 testes passam; correções A1 e A2 já no motor).
-Comparação: commit `a855d7b` (antes das correções), em `out/a855d7b/`.
+Comparação: commit `a855d7b` (antes das correções), em `results/a855d7b/`.
 
 ## Como foi medido
 
-- 16.600 partidas no motor e56251f (46 experimentos) e 20.600 no a855d7b (56 experimentos). Sementes fixas; duas execuções dão resultado idêntico (`npm run check`).
+- 13.200 partidas no motor e56251f (46 experimentos) e 20.600 no a855d7b (59 experimentos). Sementes fixas; duas execuções dão resultado idêntico (`npm run check`).
 - Os bots usam só `applyAction`, `chooseDilemma` e `endTurn` do motor real. Nenhum arquivo de `src/` foi copiado nem alterado.
 - 6 estratégias: agressivo (massa), mercador (tratados, troca por influência, toma neutros seguros), tartaruga (muralhas, não ataca), oportunista (ataca o mais fraco com margem), traidor (assina e quebra quando a conquista vale mais que a multa), passivo (não age, ignora dilemas).
 - `índice` = taxa de vitória ÷ fatia justa (1 ÷ jogadores). 1,00 = equilibrado.
@@ -50,7 +50,7 @@ Comparação: commit `a855d7b` (antes das correções), em `out/a855d7b/`.
 - 0,71 eliminação por partida; 15,5% das campanhas acabam antes do turno 60.
 
 ## Guerra
-- Regra de 1 ataque por exército (A2): efeito pequeno na vitória do agressivo (motor antigo: 1,60 com encadeamento, 1,56 sem). O limite real é o dinheiro: 20 por conquista.
+- Regra de 1 ataque por exército (A2): efeito pequeno na vitória do agressivo (motor antigo, 1 agressivo contra 3 tartarugas: índice 1,60 com encadeamento e 1,56 sem). O limite real é o dinheiro: 20 por conquista.
 - Manutenção linear consome 40% a 64% da renda. A proposta superlinear (floor(n/3) + max(0, n−6)) consumiria 64% a 120%.
 - Com a superlinear cobrada: agressivo 1,33 → 0,98; tartaruga 0,45 → 0,87; Militarista 0,43 → 0,91. Mas as vezes sem ação sobem (68% → 80%). Só medição; a regra não mudou.
 
@@ -278,4 +278,4 @@ Combate determinístico e dilema sempre resolvido (0% ignorados por bots ativos)
 | tartaruga | 0.33 | 0.52 | 1 | 1.84 | 90% | 72% |
 | passivo | 0 | 0 | 0.93 | 1.31 | 100% | 100% |
 
-Tabelas completas (todas as combinações): `tools/sim/out/e56251f/tables.md` e `tools/sim/out/a855d7b/tables.md`.
+Tabelas completas (todas as combinações): `tools/sim/results/e56251f/tables.md` e `tools/sim/results/a855d7b/tables.md`.

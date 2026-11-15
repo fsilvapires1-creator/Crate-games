@@ -156,7 +156,7 @@ async function main() {
     'Hash dos resultados': createHash('sha256').update(json).digest('hex').slice(0, 16),
     'Bots': 'usam só applyAction, chooseDilemma e endTurn; sementes fixas; sem relógio nem Math.random',
   };
-  const outDir = join(root, 'out', engineCommit);
+  const outDir = join(root, 'results', engineCommit);
   mkdirSync(outDir, { recursive: true });
   const suffix = only ? `-${only}` : '';
   writeFileSync(join(outDir, `results${suffix}.json`), json + '\n');

@@ -13,7 +13,7 @@ cd tools/sim && ENGINE_DIR=/caminho/do/checkout npm run sim -- --only=mix-4
 cd tools/sim && ENGINE_DIR=/caminho/do/checkout npm run check   # determinismo
 ```
 
-Saída em `out/<commit>/`: `results.json` (agregados) e `tables.md` (todas as tabelas).
+Saída em `results/<commit>/`: `results.json` (agregados) e `tables.md` (todas as tabelas).
 `REPORT.md` é a análise escrita do último motor testado.
 
 ## Peças
