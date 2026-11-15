@@ -1,0 +1,16 @@
+{
+  "name": "jogo-de-paises-sim",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Headless bot simulator for Jogo de Países. Imports the real rules engine from another checkout.",
+  "scripts": {
+    "sim": "tsx src/main.ts",
+    "check": "tsx src/main.ts --check"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "@types/node": "^22.9.0"
+  }
+}

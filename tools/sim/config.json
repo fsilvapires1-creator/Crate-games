@@ -1,0 +1,159 @@
+{
+  "_doc": "Tunable values of the simulator. Rules of the game itself stay in the engine's src/data/rules.json.",
+  "engineRef": "e56251f",
+  "gamesPerConfig": 200,
+  "campaign": {
+    "turns": 60,
+    "sessionLength": 6,
+    "players": 4
+  },
+  "superlinearUpkeep": {
+    "_doc": "Proposal of sala Guerra (guerra-obsidian-camp-002): floor(n/3) + max(0, n - freeAbove) per region. Measured only.",
+    "freeAbove": 6
+  },
+  "snowballTurn": 10,
+  "money": {
+    "lowBelow": 10,
+    "highAbove": 50
+  },
+  "valuation": {
+    "_doc": "How bots convert things to score points.",
+    "pointsPerMoney": 0.1
+  },
+  "strategies": {
+    "agressivo": {
+      "label": "Agressivo (massa)",
+      "reserve": 0,
+      "tradeAbove": 100000,
+      "attackMargin": 1.0,
+      "attacks": "all",
+      "massAttack": true,
+      "treatyMinProfit": 100000,
+      "acceptTreatyProb": 0,
+      "denyWeight": 1.0,
+      "buildingMinTurnsLeft": 100000,
+      "walls": false,
+      "farms": true,
+      "dilemma": {
+        "money": 0.1,
+        "influence": 1,
+        "reputation": 0,
+        "army": 1.0,
+        "pop": 0.25
+      },
+      "betrays": false
+    },
+    "mercador": {
+      "label": "Mercador (economia e tratados)",
+      "reserve": 10,
+      "tradeAbove": 40,
+      "attackMargin": 1.5,
+      "attacks": "neutral",
+      "massAttack": false,
+      "treatyMinProfit": -2,
+      "acceptTreatyProb": 1,
+      "denyWeight": 0,
+      "buildingMinTurnsLeft": 10,
+      "walls": false,
+      "farms": true,
+      "dilemma": {
+        "money": 0.1,
+        "influence": 1,
+        "reputation": 0,
+        "army": 0.2,
+        "pop": 0.3
+      },
+      "betrays": false
+    },
+    "tartaruga": {
+      "label": "Tartaruga (muralhas e fazendas)",
+      "reserve": 10,
+      "tradeAbove": 40,
+      "attackMargin": 100000,
+      "attacks": "none",
+      "massAttack": false,
+      "treatyMinProfit": -2,
+      "acceptTreatyProb": 1,
+      "denyWeight": 0,
+      "buildingMinTurnsLeft": 100000,
+      "walls": true,
+      "farms": true,
+      "dilemma": {
+        "money": 0.1,
+        "influence": 1,
+        "reputation": 0,
+        "army": 0.4,
+        "pop": 0.3
+      },
+      "betrays": false
+    },
+    "oportunista": {
+      "label": "Oportunista (ataca o mais fraco)",
+      "reserve": 10,
+      "tradeAbove": 50,
+      "attackMargin": 1.3,
+      "attacks": "weakest",
+      "massAttack": false,
+      "treatyMinProfit": 100000,
+      "acceptTreatyProb": 0.5,
+      "denyWeight": 0.5,
+      "buildingMinTurnsLeft": 100000,
+      "walls": false,
+      "farms": true,
+      "dilemma": {
+        "money": 0.1,
+        "influence": 1,
+        "reputation": 0,
+        "army": 0.5,
+        "pop": 0.25
+      },
+      "betrays": false
+    },
+    "traidor": {
+      "label": "Traidor (quebra tratado quando lucra)",
+      "reserve": 10,
+      "tradeAbove": 50,
+      "attackMargin": 1.2,
+      "attacks": "all",
+      "massAttack": false,
+      "treatyMinProfit": -2,
+      "acceptTreatyProb": 1,
+      "denyWeight": 0.5,
+      "buildingMinTurnsLeft": 100000,
+      "walls": false,
+      "farms": true,
+      "dilemma": {
+        "money": 0.1,
+        "influence": 1,
+        "reputation": 0,
+        "army": 0.5,
+        "pop": 0.25
+      },
+      "betrays": true
+    },
+    "passivo": {
+      "label": "Passivo (só ignora)",
+      "reserve": 0,
+      "tradeAbove": 100000,
+      "attackMargin": 100000,
+      "attacks": "none",
+      "massAttack": false,
+      "treatyMinProfit": 100000,
+      "acceptTreatyProb": 0,
+      "denyWeight": 0,
+      "buildingMinTurnsLeft": 100000,
+      "walls": false,
+      "farms": false,
+      "dilemma": {
+        "money": 0,
+        "influence": 0,
+        "reputation": 0,
+        "army": 0,
+        "pop": 0
+      },
+      "betrays": false
+    }
+  },
+  "endgameRounds": 3,
+  "_endgameDoc": "In the last endgameRounds rounds every active bot trades spare money for influence (10 money = 1 point), since money scores nothing."
+}
